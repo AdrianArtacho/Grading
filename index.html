@@ -122,11 +122,11 @@ Example:
 
 <hr style="margin: 30px 0;">
 
-<label>Previous Grade</label>
-<input id="previousGradeInput" type="number" step="0.1" placeholder="Enter previous grade">
+<label>Previous Exam Score</label>
+<input id="previousScoreInput" type="number" step="0.1" placeholder="Enter previous score">
 
 <div class="result">
-<div>Progress</div>
+<div>Score Progress</div>
 <div class="big" id="progressOutput">—</div>
 <div id="progressDetails"></div>
 </div>
@@ -182,17 +182,23 @@ function calculateGrade(score, min, max, pass, grades) {
     return grade;
 }
 
-function updateProgress(currentGrade) {
-    const previousGrade = parseFloat(document.getElementById("previousGradeInput").value);
+function updateProgress(currentScore) {
+    const previousScore = parseFloat(document.getElementById("previousScoreInput").value);
 
-    if (isNaN(previousGrade) || isNaN(currentGrade)) {
+    if (isNaN(previousScore) || isNaN(currentScore)) {
         document.getElementById("progressOutput").innerText = "—";
         document.getElementById("progressDetails").innerText = "";
         return;
     }
 
-    const difference = previousGrade - currentGrade;
-    const percent = (difference / previousGrade) * 100;
+    if (previousScore === 0) {
+        document.getElementById("progressOutput").innerText = "—";
+        document.getElementById("progressDetails").innerText = "Progress cannot be calculated from a previous score of 0.";
+        return;
+    }
+
+    const difference = currentScore - previousScore;
+    const percent = (difference / previousScore) * 100;
 
     let label;
 
@@ -207,9 +213,9 @@ function updateProgress(currentGrade) {
     document.getElementById("progressOutput").innerText = label;
 
     document.getElementById("progressDetails").innerHTML = `
-        Previous grade: <strong>${previousGrade}</strong><br>
-        Current grade: <strong>${currentGrade}</strong><br>
-        Difference: ${difference.toFixed(2)}
+        Previous score: <strong>${previousScore}</strong><br>
+        Current score: <strong>${currentScore}</strong><br>
+        Difference: ${difference.toFixed(2)} points
     `;
 }
 
@@ -239,11 +245,11 @@ function update() {
         Passing: ${pass}
     `;
 
-    updateProgress(grade);
+    updateProgress(score);
 }
 
 document.getElementById("scoreInput").addEventListener("input", update);
-document.getElementById("previousGradeInput").addEventListener("input", update);
+document.getElementById("previousScoreInput").addEventListener("input", update);
 
 </script>
 
