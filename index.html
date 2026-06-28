@@ -120,6 +120,17 @@ Example:
 <div id="details"></div>
 </div>
 
+<hr style="margin: 30px 0;">
+
+<label>Previous Grade</label>
+<input id="previousGradeInput" type="number" step="0.1" placeholder="Enter previous grade">
+
+<div class="result">
+<div>Progress</div>
+<div class="big" id="progressOutput">—</div>
+<div id="progressDetails"></div>
+</div>
+
 </div>
 
 <script>
@@ -171,6 +182,37 @@ function calculateGrade(score, min, max, pass, grades) {
     return grade;
 }
 
+function updateProgress(currentGrade) {
+    const previousGrade = parseFloat(document.getElementById("previousGradeInput").value);
+
+    if (isNaN(previousGrade) || isNaN(currentGrade)) {
+        document.getElementById("progressOutput").innerText = "—";
+        document.getElementById("progressDetails").innerText = "";
+        return;
+    }
+
+    const difference = previousGrade - currentGrade;
+    const percent = (difference / previousGrade) * 100;
+
+    let label;
+
+    if (percent > 0) {
+        label = `${percent.toFixed(1)}% better`;
+    } else if (percent < 0) {
+        label = `${Math.abs(percent).toFixed(1)}% worse`;
+    } else {
+        label = "No change";
+    }
+
+    document.getElementById("progressOutput").innerText = label;
+
+    document.getElementById("progressDetails").innerHTML = `
+        Previous grade: <strong>${previousGrade}</strong><br>
+        Current grade: <strong>${currentGrade}</strong><br>
+        Difference: ${difference.toFixed(2)}
+    `;
+}
+
 function update() {
 
     const min = parseFloat(document.getElementById("minVal").value);
@@ -183,6 +225,7 @@ function update() {
     if (isNaN(score)) {
         document.getElementById("gradeOutput").innerText = "—";
         document.getElementById("details").innerText = "";
+        updateProgress(NaN);
         return;
     }
 
@@ -195,9 +238,12 @@ function update() {
         Range: ${min}–${max}<br>
         Passing: ${pass}
     `;
+
+    updateProgress(grade);
 }
 
 document.getElementById("scoreInput").addEventListener("input", update);
+document.getElementById("previousGradeInput").addEventListener("input", update);
 
 </script>
 
